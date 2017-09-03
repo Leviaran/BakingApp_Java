@@ -42,7 +42,7 @@ public class IntentTest {
 
     @Before
     public void registerIdlingRes(){
-        mIdlingResources = mActivityTest.getActivity().getMIdlingRes();
+        mIdlingResources = mActivityTest.getActivity().getIdleRes();
         //Check with Espresso
         Espresso.registerIdlingResources(mIdlingResources);
     }

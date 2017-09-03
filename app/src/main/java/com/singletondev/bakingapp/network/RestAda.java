@@ -31,9 +31,8 @@ public class RestAda {
 
         Retrofit endpoints;
         endpoints = new Retrofit.Builder()
-
-                .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(baseURL)
+                .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(okhttpClientBuilder.build())
                 .build();

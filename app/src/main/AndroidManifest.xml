@@ -22,16 +22,16 @@
         </activity>
         <activity android:name=".RecipeDetailACtivity" />
 
-
-        <service android:name=".widget.updateBakingServ"
-            android:permission="android.permission.BIND_REMOTEVIEWS"/>
+        <service
+            android:name=".widget.updateBakingServ"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
         <service
             android:name=".widget.GridWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
-        <receiver android:name=".widget.NewAppWidget"
+        <receiver
+            android:name=".widget.NewAppWidget"
             android:icon="@android:drawable/ic_dialog_alert">
-
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE2" />
@@ -41,6 +41,10 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/new_app_widget_info" />
         </receiver>
+
+        <activity android:name=".FullscreenDialog"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:screenOrientation="landscape"/>
     </application>
 
 </manifest>

@@ -1,6 +1,8 @@
 package com.singletondev.bakingapp;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,13 +10,16 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,7 +57,7 @@ import static com.singletondev.bakingapp.Besa.SELECTED_STEPS;
  * @github https://github.com/Leviaran
  */
 
-public class RecipeDetailStepsFragment2 extends Fragment{
+public class RecipeDetailStepsFragment extends Fragment{
     SimpleExoPlayer player;
     SimpleExoPlayerView playerView;
     BandwidthMeter bandwidthMeter;
@@ -61,11 +66,12 @@ public class RecipeDetailStepsFragment2 extends Fragment{
     android.os.Handler handler;
     List<resep> recipe;
     String recipeName;
+    ImageView buttonFull;
 
     ListItemClickListener listItemClickListener;
 
     interface ListItemClickListener{
-        void onListItemClick(List<Steps> steps,Integer index, String recipeName);
+        void onListItemClick(List<Steps> steps,int index, String recipeName);
     }
 
     @Nullable
@@ -100,6 +106,8 @@ public class RecipeDetailStepsFragment2 extends Fragment{
         textView.setText(listSteps.get(selectedIndex).getDescription());
         textView.setVisibility(View.VISIBLE);
 
+        buttonFull = view.findViewById(R.id.btn_full);
+
         playerView = view.findViewById(R.id.simpleExoPlayer);
         playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
 
@@ -107,8 +115,8 @@ public class RecipeDetailStepsFragment2 extends Fragment{
 
         if (TextUtils.isEmpty(stringURL)){
             player = null;
-            playerView.setForeground(ContextCompat.getDrawable(getContext(),R.drawable.youtube_fail2));
-            playerView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
+            playerView.setForeground(ContextCompat.getDrawable(getContext(),R.drawable.youtube_fail));
+            //playerView.setLayoutParams(new LinearLayout.LayoutParams(300,300));
 
             if (view.findViewWithTag("view-land") != null){
                 Log.e("View1","view-land");
@@ -134,6 +142,16 @@ public class RecipeDetailStepsFragment2 extends Fragment{
             }
 
         }
+
+        buttonFull.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(),FullscreenDialog.class);
+                String url = listSteps.get(selectedIndex).getVideoURL();
+                intent.putExtra("StringURL",url);
+                startActivity(intent);
+            }
+        });
 
         TextView backButton = (TextView) view.findViewById(R.id.backButton);
         TextView nextButton = (TextView) view.findViewById(R.id.nextButton);
@@ -200,5 +218,31 @@ public class RecipeDetailStepsFragment2 extends Fragment{
         outState.putString("Title",recipeName);
     }
 
-    
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (player != null){
+            player.stop();
+            player.release();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (player != null){
+            player.stop();
+            player.release();
+            player = null;
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+       if (player != null){
+           player.stop();
+           player.release();
+       }
+    }
 }
