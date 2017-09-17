@@ -12,9 +12,11 @@ import android.widget.TextView;
 import com.singletondev.bakingapp.R;
 import com.singletondev.bakingapp.modelData.Steps;
 import com.singletondev.bakingapp.modelData.resep;
+import com.singletondev.bakingapp.network.VideoRequestHandler;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by Randy Arba on 8/31/17.
@@ -34,6 +36,8 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
     private List<resep> reseps;
     private ListItemClickListerer listItem;
     private String image_cake;
+    VideoRequestHandler videoRequestHandler;
+    Picasso picassoInstance;
 
     public RecipeDetailAdapter(ListItemClickListerer listItemClickListerer, String image_cake){
         this.listItem = listItemClickListerer;
@@ -59,18 +63,34 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
         View view = LayoutInflater.from(context).inflate(R.layout.carview_recipe_items_detail,parent,false);
         RecyclerViewHolderDetail recyclerViewHolderDetail = new RecyclerViewHolderDetail(view);
 
+
         return recyclerViewHolderDetail;
     }
 
     @Override
     public void onBindViewHolder(RecyclerViewHolderDetail holder, int position) {
+
+        videoRequestHandler = new VideoRequestHandler();
+        picassoInstance = new Picasso.Builder(context)
+                .addRequestHandler(videoRequestHandler)
+                .build();
+
+
         String imageURL = "file:///android_asset/Photo_baking/" + image_cake;
         Log.e("image",imageURL);
         holder.textShortDesc.setText(mSteps.get(position).getShortDescription());
         holder.textDesc.setText(mSteps.get(position).getDescription());
 
-        Picasso.with(context).load(imageURL).into(holder.imageThumbnail);
+        String jsonURL = mSteps.get(position).getThumbnailURL();
 
+        if (!jsonURL.equals("")){
+            Log.e("SON",jsonURL);
+            Picasso.with(context).load(jsonURL).into(holder.imageThumbnail);
+//          picassoInstance.load("video"+":"+jsonURL).into(holder.imageThumbnail);
+
+        } else {
+            Picasso.with(context).load(imageURL).into(holder.imageThumbnail);
+        }
     }
 
     @Override

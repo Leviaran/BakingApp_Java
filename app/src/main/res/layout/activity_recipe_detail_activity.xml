@@ -9,8 +9,7 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
+        android:layout_height="wrap_content">
         
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
@@ -19,23 +18,22 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleMarginStart="50dp"
-            app:expandedTitleMarginEnd="65dp"
-            android:fitsSystemWindows="true">
+            app:expandedTitleMarginEnd="65dp">
 
             <ImageView
                 android:id="@+id/image"
                 android:layout_width="match_parent"
                 android:layout_height="247dp"
                 android:scaleType="centerCrop"
-                android:fitsSystemWindows="true"
                 app:layout_collapseMode="parallax"
-                android:src="@drawable/brownies"/>
+                android:src="@drawable/brownies" />
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin" />
+                app:layout_collapseMode="pin"
+                android:fitsSystemWindows="true"/>
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -44,6 +42,14 @@
 
     <FrameLayout
         android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerInside"
+        android:clipToPadding="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    <FrameLayout
+        android:id="@+id/fragment_container2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerInside"

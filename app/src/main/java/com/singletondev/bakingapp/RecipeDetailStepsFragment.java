@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -23,6 +24,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -57,7 +59,10 @@ import static com.singletondev.bakingapp.Besa.SELECTED_STEPS;
  * @github https://github.com/Leviaran
  */
 
+
 public class RecipeDetailStepsFragment extends Fragment{
+
+    public static String SELECTED_POSITION = "SELECTED_POSITION";
     SimpleExoPlayer player;
     SimpleExoPlayerView playerView;
     BandwidthMeter bandwidthMeter;
@@ -67,6 +72,8 @@ public class RecipeDetailStepsFragment extends Fragment{
     List<resep> recipe;
     String recipeName;
     ImageView buttonFull;
+    Long position;
+    String stringURL;
 
     ListItemClickListener listItemClickListener;
 
@@ -83,15 +90,23 @@ public class RecipeDetailStepsFragment extends Fragment{
         listItemClickListener = (RecipeDetailACtivity) getActivity();
         recipe = new ArrayList<>();
 
+        Log.e("CreatePost","Kali");
+
+        position = C.TIME_UNSET;
         if (savedInstanceState != null){
             listSteps = savedInstanceState.getParcelableArrayList(SELECTED_STEPS);
             selectedIndex = savedInstanceState.getInt(SELECTED_INDEX);
             recipeName = savedInstanceState.getString("Title");
+            position = savedInstanceState.getLong(SELECTED_POSITION);
+            Log.e("newPosition",String.valueOf(position));
+
         } else {
+            Log.e("PostitionValid","notValid");
             if (getArguments().getParcelableArrayList(SELECTED_STEPS) != null){
                 listSteps = getArguments().getParcelableArrayList(SELECTED_STEPS);
                 selectedIndex = getArguments().getInt(SELECTED_INDEX);
                 recipeName = getArguments().getString("Title");
+                position = getArguments().getLong(SELECTED_POSITION);
             } else {
                 recipe = getArguments().getParcelableArrayList(SELECTED_RECIPES);
                 listSteps = recipe.get(0).getSteps();
@@ -111,7 +126,7 @@ public class RecipeDetailStepsFragment extends Fragment{
         playerView = view.findViewById(R.id.simpleExoPlayer);
         playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
 
-        String stringURL = listSteps.get(selectedIndex).getVideoURL();
+        stringURL = listSteps.get(selectedIndex).getVideoURL();
 
         if (TextUtils.isEmpty(stringURL)){
             player = null;
@@ -129,6 +144,8 @@ public class RecipeDetailStepsFragment extends Fragment{
                 view.findViewById(R.id.rl_navigation).setVisibility(View.GONE);
             }
         } else {
+            Log.e("Execute","execute");
+            Log.e("Position",String.valueOf(position));
             initPlayer(Uri.parse(listSteps.get(selectedIndex).getVideoURL()));
             if (view.findViewWithTag("view-land") != null){
                 Log.e("View1","view-land");
@@ -195,18 +212,23 @@ public class RecipeDetailStepsFragment extends Fragment{
 
     public void initPlayer(Uri uri){
         if (player == null){
+            Log.e("Execute","execute");
             TrackSelection.Factory videoTrackSelect = new AdaptiveVideoTrackSelection.Factory(bandwidthMeter);
             DefaultTrackSelector defaultTrackSelector = new DefaultTrackSelector(handler,videoTrackSelect);
             DefaultLoadControl loadControl = new DefaultLoadControl();
 
             player = ExoPlayerFactory.newSimpleInstance(getContext(),defaultTrackSelector,loadControl);
+            player.seekTo(position);
+            Log.e("PostCond",String.valueOf(position));
+            position = player.getCurrentPosition();
+
+            Log.e("getPost",String.valueOf(player.getCurrentPosition()));
             playerView.setPlayer(player);
 
             String userAgent = Util.getUserAgent(getContext(),"BakingApp");
             MediaSource mediaSource = new ExtractorMediaSource(uri,new DefaultDataSourceFactory(getContext(),userAgent),new DefaultExtractorsFactory(),null,null);
             player.prepare(mediaSource);
             player.setPlayWhenReady(true);
-
         }
     }
 
@@ -216,6 +238,24 @@ public class RecipeDetailStepsFragment extends Fragment{
         outState.putParcelableArrayList(SELECTED_STEPS, (ArrayList<Steps>) listSteps);
         outState.putInt(SELECTED_INDEX, selectedIndex);
         outState.putString("Title",recipeName);
+        outState.putLong(SELECTED_POSITION,position);
+        Log.e("post",String.valueOf(position));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        initPlayer(Uri.parse(listSteps.get(selectedIndex).getVideoURL()));
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (player != null){
+            player.stop();
+            player.release();
+            player = null;
+        }
     }
 
     @Override
@@ -241,8 +281,13 @@ public class RecipeDetailStepsFragment extends Fragment{
     public void onPause() {
         super.onPause();
        if (player != null){
+           position = player.getCurrentPosition();
+
+           Log.e("HasilPosisi",String.valueOf(position));
+
            player.stop();
            player.release();
+           player= null;
        }
     }
 }

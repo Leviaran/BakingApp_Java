@@ -13,8 +13,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.singletondev.bakingapp.Adapters.RecipeDetailAdapter;
 import com.singletondev.bakingapp.modelData.Steps;
@@ -43,6 +45,8 @@ public class RecipeDetailACtivity extends AppCompatActivity implements RecipeDet
     static String SELECTED_INDEX="Selected_Index";
     static String STACK_RECIPE_DETAIL="STACK_RECIPE_DETAIL";
     static String STACK_RECIPE_STEP_DETAIL="STACK_RECIPE_STEP_DETAIL";
+    static String FRAGMEN_TAG = "TAG_RECIPE_DETAIL";
+    public String SELECTED_POSITION = "SELECT_POSITION";
 
     List<resep> recipe;
     String recipeName;
@@ -50,11 +54,13 @@ public class RecipeDetailACtivity extends AppCompatActivity implements RecipeDet
     AppBarLayout appbar;
     Boolean flag;
     Toolbar toolbar;
+    Long position = 3000L;
 
 
     @Override
     public void onListItemClick(List<Steps> step, int clickItemIndex, String recipeName) {
         RecipeDetailStepsFragment recipeDetailStepsFragment = new RecipeDetailStepsFragment();
+        RecipeDetailStepsFragment recipeDetailStepsFragment1 = (RecipeDetailStepsFragment) getSupportFragmentManager().findFragmentByTag(FRAGMEN_TAG);
         FragmentManager fm = getSupportFragmentManager();
         appbar.setExpanded(false);
         collapsingToolbarLayout.setTitle(recipeName);
@@ -64,16 +70,23 @@ public class RecipeDetailACtivity extends AppCompatActivity implements RecipeDet
         bundle.putParcelableArrayList(SELECTED_STEPS,(ArrayList<Steps>) step);
         bundle.putInt(SELECTED_INDEX,clickItemIndex);
         bundle.putString("Title",recipeName);
+        Log.e("posisi",String.valueOf(position));
+        bundle.putLong(SELECTED_POSITION, position);
         recipeDetailStepsFragment.setArguments(bundle);
 
+
         if (findViewById(R.id.recipe).getTag() != null && findViewById(R.id.recipe).getTag().equals("view-land")){
+            Log.e("cekPosView","View");
+
+                fm.beginTransaction()
+                        .replace(R.id.fragment_container2,recipeDetailStepsFragment)
+                        .addToBackStack(STACK_RECIPE_STEP_DETAIL)
+                        .commit();
+
+        }else {
+            Log.e("cekPosView2","View2");
             fm.beginTransaction()
                     .replace(R.id.fragment_container2,recipeDetailStepsFragment)
-                    .addToBackStack(STACK_RECIPE_STEP_DETAIL)
-                    .commit();
-        }else {
-            fm.beginTransaction()
-                    .replace(R.id.fragment_container,recipeDetailStepsFragment)
                     .addToBackStack(STACK_RECIPE_STEP_DETAIL)
                     .commit();
         }
@@ -85,38 +98,13 @@ public class RecipeDetailACtivity extends AppCompatActivity implements RecipeDet
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail_activity);
 
-        if (savedInstanceState == null){
-            Bundle selectedBundle = getIntent().getExtras();
-            recipe = new ArrayList<>();
-            recipe = selectedBundle.getParcelableArrayList(SELECTED_RECIPES);
-            recipeName = recipe.get(0).getName();
 
-            Log.e("fragment1","aktif");
-
-            DetailFragment fragmentDetail = new DetailFragment();
-            fragmentDetail.setArguments(selectedBundle);
-            FragmentManager fm = getSupportFragmentManager();
-            fm.beginTransaction()
-                    .replace(R.id.fragment_container,fragmentDetail)
-                    .addToBackStack(STACK_RECIPE_DETAIL)
-                    .commit();
-
-            if (findViewById(R.id.recipe).getTag() != null && findViewById(R.id.recipe).getTag().equals("view-land")){
-                Log.e("Fragment2","aktif");
-
-                RecipeDetailStepsFragment fragment2 = new RecipeDetailStepsFragment();
-                fragment2.setArguments(selectedBundle);
-                fm.beginTransaction()
-                        .replace(R.id.fragment_container2,fragment2)
-                        .addToBackStack(STACK_RECIPE_STEP_DETAIL)
-                        .commit();
-            }
-        } else {
             Bundle selectedBundle = getIntent().getExtras();
             recipe = new ArrayList<>();
             recipe = selectedBundle.getParcelableArrayList(SELECTED_RECIPES);
             recipeName =recipe.get(0).getName();
             Log.e("recipeName",recipe.get(0).getName());
+            Log.e("Fragment4","aktif");
 
 
             DetailFragment fragmentDetail = new DetailFragment();
@@ -124,20 +112,21 @@ public class RecipeDetailACtivity extends AppCompatActivity implements RecipeDet
             FragmentManager fman = getSupportFragmentManager();
             fman.beginTransaction()
                     .replace(R.id.fragment_container,fragmentDetail)
-                    .addToBackStack(STACK_RECIPE_DETAIL)
+                    .addToBackStack(SELECTED_RECIPES)
                     .commit();
 
-            if (findViewById(R.id.recipe).getTag() != null && findViewById(R.id.recipe).getTag().equals("view-land")){
-                Log.e("Fragment3","aktif");
-                RecipeDetailStepsFragment fragment3 = new RecipeDetailStepsFragment();
-                fragment3.setArguments(selectedBundle);
-                FragmentManager fm = getSupportFragmentManager();
-                fm.beginTransaction()
-                        .replace(R.id.fragment_container2,fragment3)
-                        .addToBackStack(STACK_RECIPE_STEP_DETAIL)
-                        .commit();
-            }
-        }
+
+//            if (findViewById(R.id.recipe).getTag() != null && findViewById(R.id.recipe).getTag().equals("view-land")){
+//                Log.e("Fragment3","aktif");
+//                RecipeDetailStepsFragment fragment3 = new RecipeDetailStepsFragment();
+//                fragment3.setArguments(selectedBundle);
+//                FragmentManager fm = getSupportFragmentManager();
+//                fm.beginTransaction()
+//                        .replace(R.id.fragment_container2,fragment3)
+//                        .addToBackStack(STACK_RECIPE_STEP_DETAIL)
+//                        .commit();
+//            }
+
 
         ViewCompat.setTransitionName(findViewById(R.id.app_bar_layout),"coba");
         supportPostponeEnterTransition();
@@ -145,6 +134,9 @@ public class RecipeDetailACtivity extends AppCompatActivity implements RecipeDet
 
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         appbar = (AppBarLayout) findViewById(R.id.app_bar_layout);
+        if (findViewById(R.id.recipe).getTag() !=null && findViewById(R.id.recipe).getTag().equals("view-lang")){
+            appbar.setExpanded(false);
+        }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -152,19 +144,11 @@ public class RecipeDetailACtivity extends AppCompatActivity implements RecipeDet
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
+
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentManager fm = getSupportFragmentManager();
-                if (findViewById(R.id.fragment_container2) == null){
-                    if (fm.getBackStackEntryCount() > 1){
-                        fm.popBackStack(STACK_RECIPE_DETAIL,0);
-                    } else if (fm.getBackStackEntryCount() > 0 ){
-                        finish();
-                    }
-                } else {
-                    finish();
-                }
+                onBackPressed();
             }
         });
 
