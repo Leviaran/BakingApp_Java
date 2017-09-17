@@ -55,6 +55,7 @@ public class RecipeDetailACtivity extends AppCompatActivity implements RecipeDet
     Boolean flag;
     Toolbar toolbar;
     Long position = 3000L;
+    DetailFragment fragmentDetail;
 
 
     @Override
@@ -98,7 +99,6 @@ public class RecipeDetailACtivity extends AppCompatActivity implements RecipeDet
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail_activity);
 
-
             Bundle selectedBundle = getIntent().getExtras();
             recipe = new ArrayList<>();
             recipe = selectedBundle.getParcelableArrayList(SELECTED_RECIPES);
@@ -106,8 +106,15 @@ public class RecipeDetailACtivity extends AppCompatActivity implements RecipeDet
             Log.e("recipeName",recipe.get(0).getName());
             Log.e("Fragment4","aktif");
 
+            if (savedInstanceState != null){
+                Log.e("loadFragment","loaded");
+                fragmentDetail = (DetailFragment) getSupportFragmentManager().getFragment(savedInstanceState,"my_fragment");
+            } else {
+                fragmentDetail = new DetailFragment();
+            }
 
-            DetailFragment fragmentDetail = new DetailFragment();
+
+
             fragmentDetail.setArguments(selectedBundle);
             FragmentManager fman = getSupportFragmentManager();
             fman.beginTransaction()
@@ -134,9 +141,6 @@ public class RecipeDetailACtivity extends AppCompatActivity implements RecipeDet
 
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         appbar = (AppBarLayout) findViewById(R.id.app_bar_layout);
-        if (findViewById(R.id.recipe).getTag() !=null && findViewById(R.id.recipe).getTag().equals("view-lang")){
-            appbar.setExpanded(false);
-        }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -187,6 +191,7 @@ public class RecipeDetailACtivity extends AppCompatActivity implements RecipeDet
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString("Title",recipeName);
+        getSupportFragmentManager().putFragment(outState, "my_fragment",fragmentDetail);
     }
 
     @Override

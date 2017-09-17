@@ -64,8 +64,13 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecyclerVi
         holder.mTextItemSteps.setText(String.valueOf(mlRecipe.get(position).getSteps().size()));
         holder.mTextItemServe.setText(String.valueOf(mlRecipe.get(position).getIngredients().size()));
 
-        Picasso.with(context).load(imageURL).into(holder.mimgRecyclerView);
+        String jsonURL = mlRecipe.get(position).getImage();
 
+        if (!jsonURL.equals("")){
+            Picasso.with(context).load(jsonURL).into(holder.mimgRecyclerView);
+        } else {
+            Picasso.with(context).load(imageURL).into(holder.mimgRecyclerView);
+        }
     }
 
     @Override
